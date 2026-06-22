@@ -8,6 +8,7 @@ backend/instance/database.db
 backend/*.pyc
 backend/venv
 backend/.venv
+**/__pycache__/
 
 # General
 .env
