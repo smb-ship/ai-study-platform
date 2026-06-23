@@ -12,17 +12,7 @@ def create_app():
     app = Flask(__name__)
     app.config.from_object('config.Config')
 
-    CORS(
-    app,
-    resources={
-        r"/api/*": {
-            "origins": [
-                "http://localhost:5173",
-                "https://superb-sprite-98683a.netlify.app"
-            ]
-        }
-    }
-)
+    CORS(app, resources={r"/api/*": {"origins": ["http://localhost:5173", "https://*.netlify.app"]}})
 
     db.init_app(app)
     bcrypt.init_app(app)
