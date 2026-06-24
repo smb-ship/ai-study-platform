@@ -29,10 +29,10 @@ def create_app():
     )
 
 
-    return app
     db.init_app(app)
     bcrypt.init_app(app)
     jwt.init_app(app)
+
 
     from app.routes.auth import auth_bp
     app.register_blueprint(auth_bp)
@@ -51,12 +51,13 @@ def create_app():
 
     from app.routes.progress import progress_bp
     app.register_blueprint(progress_bp)
-    
+
     from app.routes.settings import settings_bp
     app.register_blueprint(settings_bp)
 
 
     with app.app_context():
         db.create_all()
+
 
     return app
