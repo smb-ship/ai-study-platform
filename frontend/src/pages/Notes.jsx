@@ -33,7 +33,7 @@ function Notes() {
     setLoading(true)
     setLoadError("")
     try {
-      const res = await axios.get("${import.meta.env.VITE_API_URL}/api/notes/", { headers })
+      const res = await axios.get(`${import.meta.env.VITE_API_URL}/api/notes/`, { headers })
       setNotes(res.data)
     } catch (err) {
       if (err.response?.status === 401) {
@@ -70,7 +70,7 @@ function Notes() {
         setSuccess("Note updated!")
       } else {
         await axios.post(
-          "${import.meta.env.VITE_API_URL}/api/notes/",
+          `${import.meta.env.VITE_API_URL}/api/notes/`,
           { title, content },
           { headers }
         )

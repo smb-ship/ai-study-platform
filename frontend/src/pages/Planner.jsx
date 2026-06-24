@@ -33,7 +33,7 @@ function Planner() {
     setLoading(true)
     setLoadError("")
     try {
-      const res = await axios.get("${import.meta.env.VITE_API_URL}/api/planner/", { headers })
+      const res = await axios.get(`${import.meta.env.VITE_API_URL}/api/planner/`, { headers })
       setTasks(res.data)
     } catch (err) {
       if (err.response?.status === 401) {
@@ -69,7 +69,7 @@ function Planner() {
         )
         setSuccess("Task updated!")
       } else {
-        await axios.post("${import.meta.env.VITE_API_URL}/api/planner/", form, { headers })
+        await axios.post(`${import.meta.env.VITE_API_URL}/api/planner/`, form, { headers })
         setSuccess("Task created!")
       }
 
