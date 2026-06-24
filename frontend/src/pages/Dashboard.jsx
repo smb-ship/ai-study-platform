@@ -20,13 +20,15 @@ function Dashboard() {
     const fetchData = async () => {
       try {
         const [userRes, statsRes] = await Promise.all([
-          axios.get("http://127.0.0.1:5000/api/me", { headers }),
-          axios.get("http://127.0.0.1:5000/api/progress/summary", { headers })
-        ])
+  axios.get(`${import.meta.env.VITE_API_URL}/api/me`, { headers }),
+  axios.get(`${import.meta.env.VITE_API_URL}/api/progress/summary`, { headers })
+])
+
         setUser(userRes.data)
         setStats(statsRes.data)
       } catch (err) {
         if (err.response?.status === 401) {
+          
           localStorage.removeItem("token")
           navigate("/login")
         } else {

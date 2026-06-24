@@ -33,7 +33,7 @@ function Notes() {
     setLoading(true)
     setLoadError("")
     try {
-      const res = await axios.get("http://127.0.0.1:5000/api/notes/", { headers })
+      const res = await axios.get("${import.meta.env.VITE_API_URL}/api/notes/", { headers })
       setNotes(res.data)
     } catch (err) {
       if (err.response?.status === 401) {
@@ -63,14 +63,14 @@ function Notes() {
     try {
       if (editingNote) {
         await axios.put(
-          `http://127.0.0.1:5000/api/notes/${editingNote.id}`,
+          `${import.meta.env.VITE_API_URL}/api/notes/${editingNote.id}`,
           { title, content },
           { headers }
         )
         setSuccess("Note updated!")
       } else {
         await axios.post(
-          "http://127.0.0.1:5000/api/notes/",
+          "${import.meta.env.VITE_API_URL}/api/notes/",
           { title, content },
           { headers }
         )
@@ -91,7 +91,7 @@ function Notes() {
   const handleDelete = async (id) => {
     try {
       await axios.delete(
-        `http://127.0.0.1:5000/api/notes/${id}`,
+        `${import.meta.env.VITE_API_URL}/api/notes/${id}`,
         { headers }
       )
       fetchNotes()

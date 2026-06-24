@@ -142,5 +142,4 @@ function Tutor() {
     </div>
   )
 }
-
 export default Tutor

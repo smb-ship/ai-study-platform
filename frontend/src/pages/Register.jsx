@@ -20,7 +20,7 @@ setError("");
 try{
 
 const response = await axios.post(
-"http://127.0.0.1:5000/api/register",
+`${import.meta.env.VITE_API_URL}/api/register`,
 {
 name,
 email,

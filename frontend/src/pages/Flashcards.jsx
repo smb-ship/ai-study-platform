@@ -34,7 +34,7 @@ function Flashcards() {
     setLoading(true)
     setLoadError("")
     try {
-      const res = await axios.get("http://127.0.0.1:5000/api/flashcards/", { headers })
+      const res = await axios.get("${import.meta.env.VITE_API_URL}/api/flashcards/", { headers })
       setDecks(res.data)
     } catch (err) {
       if (err.response?.status === 401) {
@@ -51,7 +51,7 @@ function Flashcards() {
 
   const fetchCards = async (deckId) => {
     try {
-      const res = await axios.get(`http://127.0.0.1:5000/api/flashcards/${deckId}/cards`, { headers })
+      const res = await axios.get(`${import.meta.env.VITE_API_URL}/api/flashcards/${deckId}/cards`, { headers })
       setCards(res.data)
     } catch (err) {
       console.log(err)
@@ -62,7 +62,7 @@ function Flashcards() {
     setError("")
     if (!deckTitle) { setError("Deck title is required"); return }
     try {
-      await axios.post("http://127.0.0.1:5000/api/flashcards/", { title: deckTitle, description: deckDesc }, { headers })
+      await axios.post("${import.meta.env.VITE_API_URL}/api/flashcards/", { title: deckTitle, description: deckDesc }, { headers })
       setDeckTitle("")
       setDeckDesc("")
       setSuccess("Deck created!")
@@ -75,7 +75,7 @@ function Flashcards() {
 
   const handleDeleteDeck = async (deckId) => {
     try {
-      await axios.delete(`http://127.0.0.1:5000/api/flashcards/${deckId}`, { headers })
+      await axios.delete(`${import.meta.env.VITE_API_URL}/api/flashcards/${deckId}`, { headers })
       fetchDecks()
     } catch (err) {
       setError("Failed to delete deck")
@@ -87,7 +87,7 @@ function Flashcards() {
     if (!cardFront || !cardBack) { setError("Front and back are required"); return }
     try {
       await axios.post(
-        `http://127.0.0.1:5000/api/flashcards/${activeDeck.id}/cards`,
+        `${import.meta.env.VITE_API_URL}/api/flashcards/${activeDeck.id}/cards`,
         { front: cardFront, back: cardBack },
         { headers }
       )
@@ -104,7 +104,7 @@ function Flashcards() {
 
   const handleDeleteCard = async (cardId) => {
     try {
-      await axios.delete(`http://127.0.0.1:5000/api/flashcards/cards/${cardId}`, { headers })
+      await axios.delete(`${import.meta.env.VITE_API_URL}/api/flashcards/cards/${cardId}`, { headers })
       fetchCards(activeDeck.id)
       fetchDecks()
     } catch (err) {
@@ -114,7 +114,7 @@ function Flashcards() {
 
   const handleToggleLearned = async (cardId) => {
     try {
-      await axios.put(`http://127.0.0.1:5000/api/flashcards/cards/${cardId}/learned`, {}, { headers })
+      await axios.put(`${import.meta.env.VITE_API_URL}/api/flashcards/cards/${cardId}/learned`, {}, { headers })
       fetchCards(activeDeck.id)
     } catch (err) {
       console.log(err)

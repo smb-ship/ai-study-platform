@@ -38,7 +38,7 @@ function Settings() {
   const fetchUser = () => {
     setPageLoading(true)
     setLoadError("")
-    axios.get("http://127.0.0.1:5000/api/me", { headers })
+    axios.get(`${import.meta.env.VITE_API_URL}/api/me`, { headers })
       .then(res => {
         setUser(res.data)
         setName(res.data.name)
@@ -59,7 +59,7 @@ function Settings() {
     setProfileErr("")
     try {
       const res = await axios.put(
-        "http://127.0.0.1:5000/api/settings/update-profile",
+        `${import.meta.env.VITE_API_URL}/api/settings/update-profile`,
         { name },
         { headers }
       )
@@ -90,7 +90,7 @@ function Settings() {
 
     try {
       const res = await axios.put(
-        "http://127.0.0.1:5000/api/settings/change-password",
+        `${import.meta.env.VITE_API_URL}/api/settings/change-password`,
         { current_password: currentPassword, new_password: newPassword },
         { headers }
       )
@@ -106,7 +106,7 @@ function Settings() {
 
   const handleDeleteAccount = async () => {
     try {
-      await axios.delete("http://127.0.0.1:5000/api/settings/delete-account", { headers })
+      await axios.delete(`${import.meta.env.VITE_API_URL}/api/settings/delete-account`, { headers })
       localStorage.removeItem("token")
       navigate("/login")
     } catch (err) {

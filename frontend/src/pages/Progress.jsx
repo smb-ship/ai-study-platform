@@ -18,7 +18,7 @@ function Progress() {
 
   const fetchProgress = () => {
     setLoadError("")
-    axios.get("http://127.0.0.1:5000/api/progress/", { headers })
+    axios.get(`${import.meta.env.VITE_API_URL}/api/progress/`, { headers })
       .then(res => setData(res.data))
       .catch(err => {
         if (err.response?.status === 401) navigate("/login")

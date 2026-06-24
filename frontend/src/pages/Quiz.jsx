@@ -28,7 +28,7 @@ function Quiz() {
     setLoading(true)
     setLoadError("")
     try {
-      const res = await axios.get("http://127.0.0.1:5000/api/quiz/", { headers })
+      const res = await axios.get("${import.meta.env.VITE_API_URL}/api/quiz/", { headers })
       setQuizzes(res.data)
     } catch (err) {
       if (err.response?.status === 401) {
@@ -45,7 +45,7 @@ function Quiz() {
 
   const handleSeed = async () => {
     try {
-      await axios.post("http://127.0.0.1:5000/api/quiz/seed", {}, { headers })
+      await axios.post("${import.meta.env.VITE_API_URL}/api/quiz/seed", {}, { headers })
       setSeeded(true)
       fetchQuizzes()
     } catch (err) {
@@ -56,7 +56,7 @@ function Quiz() {
   const handleStartQuiz = async (quizId) => {
     setLoading(true)
     try {
-      const res = await axios.get(`http://127.0.0.1:5000/api/quiz/${quizId}`, { headers })
+      const res = await axios.get(`${import.meta.env.VITE_API_URL}/api/quiz/${quizId}`, { headers })
       setActiveQuiz(res.data)
       setQuestions(res.data.questions)
       setCurrentIndex(0)
@@ -75,7 +75,7 @@ function Quiz() {
   const handleSubmit = async () => {
     try {
       const res = await axios.post(
-        `http://127.0.0.1:5000/api/quiz/${activeQuiz.id}/submit`,
+        `${import.meta.env.VITE_API_URL}/api/quiz/${activeQuiz.id}/submit`,
         { answers },
         { headers }
       )

@@ -33,7 +33,7 @@ function Planner() {
     setLoading(true)
     setLoadError("")
     try {
-      const res = await axios.get("http://127.0.0.1:5000/api/planner/", { headers })
+      const res = await axios.get("${import.meta.env.VITE_API_URL}/api/planner/", { headers })
       setTasks(res.data)
     } catch (err) {
       if (err.response?.status === 401) {
@@ -64,12 +64,12 @@ function Planner() {
     try {
       if (editingTask) {
         await axios.put(
-          `http://127.0.0.1:5000/api/planner/${editingTask.id}`,
+          `${import.meta.env.VITE_API_URL}/api/planner/${editingTask.id}`,
           form, { headers }
         )
         setSuccess("Task updated!")
       } else {
-        await axios.post("http://127.0.0.1:5000/api/planner/", form, { headers })
+        await axios.post("${import.meta.env.VITE_API_URL}/api/planner/", form, { headers })
         setSuccess("Task created!")
       }
 
@@ -105,7 +105,7 @@ function Planner() {
   const handleToggleComplete = async (task) => {
     try {
       await axios.put(
-        `http://127.0.0.1:5000/api/planner/${task.id}`,
+        `${import.meta.env.VITE_API_URL}/api/planner/${task.id}`,
         { ...task, completed: !task.completed },
         { headers }
       )
@@ -117,7 +117,7 @@ function Planner() {
 
   const handleDelete = async (taskId) => {
     try {
-      await axios.delete(`http://127.0.0.1:5000/api/planner/${taskId}`, { headers })
+      await axios.delete(`${import.meta.env.VITE_API_URL}/api/planner/${taskId}`, { headers })
       fetchTasks()
     } catch (err) {
       setError("Failed to delete task")
