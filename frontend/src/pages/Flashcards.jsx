@@ -34,7 +34,7 @@ function Flashcards() {
     setLoading(true)
     setLoadError("")
     try {
-      const res = await axios.get("${import.meta.env.VITE_API_URL}/api/flashcards/", { headers })
+      const res = await axios.get(`${import.meta.env.VITE_API_URL}/api/flashcards/`, { headers })
       setDecks(res.data)
     } catch (err) {
       if (err.response?.status === 401) {
@@ -62,7 +62,7 @@ function Flashcards() {
     setError("")
     if (!deckTitle) { setError("Deck title is required"); return }
     try {
-      await axios.post("${import.meta.env.VITE_API_URL}/api/flashcards/", { title: deckTitle, description: deckDesc }, { headers })
+      await axios.post(`${import.meta.env.VITE_API_URL}/api/flashcards/`, { title: deckTitle, description: deckDesc }, { headers })
       setDeckTitle("")
       setDeckDesc("")
       setSuccess("Deck created!")
