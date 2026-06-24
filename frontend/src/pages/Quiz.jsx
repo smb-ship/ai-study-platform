@@ -28,7 +28,7 @@ function Quiz() {
     setLoading(true)
     setLoadError("")
     try {
-      const res = await axios.get("${import.meta.env.VITE_API_URL}/api/quiz/", { headers })
+      const res = await axios.get(`${import.meta.env.VITE_API_URL}/api/quiz/`, { headers })
       setQuizzes(res.data)
     } catch (err) {
       if (err.response?.status === 401) {
@@ -45,7 +45,7 @@ function Quiz() {
 
   const handleSeed = async () => {
     try {
-      await axios.post("${import.meta.env.VITE_API_URL}/api/quiz/seed", {}, { headers })
+      await axios.post(`${import.meta.env.VITE_API_URL}/api/quiz/seed`, {}, { headers })
       setSeeded(true)
       fetchQuizzes()
     } catch (err) {
