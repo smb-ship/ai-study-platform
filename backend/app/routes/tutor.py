@@ -16,31 +16,33 @@ def get_current_user_id():
     return int(get_jwt_identity())
 
 
-@tutor_bp.route("", methods=["POST"])
-def ask_tutor():
+@tutor_bp.route("/tutor", methods=["POST"])
+def tutor():
+
     try:
-        get_current_user_id()
         data = request.get_json()
+
         question = data.get("question")
 
-        if not question:
-            return jsonify({"error": "Question is required"}), 400
-
-        model = genai.GenerativeModel(
-    "gemini-2.0-flash-lite"
-)
-        response = model.generate_content(
-    prompt,
-    generation_config={
-        "max_output_tokens": 300
-    }
-)
+        prompt = (
             f"You are a friendly, encouraging study tutor for students. "
-            f"Explain clearly and simply. Student's question: {question}"
+            f"Answer clearly and simply. "
+            f"Question: {question}"
         )
 
-        return jsonify({"answer": response.text}), 200
+        response = model.generate_content(
+            prompt,
+            generation_config={
+                "max_output_tokens": 300
+            }
+        )
+
+        return jsonify({
+            "answer": response.text
+        })
 
     except Exception as e:
         print("TUTOR ERROR:", e)
-        return jsonify({"error": "Failed to get AI response"}), 500
+        return jsonify({
+            "error": "Something went wrong"
+        }), 500
