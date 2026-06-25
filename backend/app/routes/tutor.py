@@ -27,9 +27,14 @@ def ask_tutor():
             return jsonify({"error": "Question is required"}), 400
 
         model = genai.GenerativeModel(
-    "gemini-2.0-flash"
+    "gemini-2.0-flash-lite"
 )
         response = model.generate_content(
+    prompt,
+    generation_config={
+        "max_output_tokens": 300
+    }
+)
             f"You are a friendly, encouraging study tutor for students. "
             f"Explain clearly and simply. Student's question: {question}"
         )
