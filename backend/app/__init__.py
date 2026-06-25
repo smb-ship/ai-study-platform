@@ -11,6 +11,7 @@ jwt = JWTManager()
 
 def create_app():
 
+
     app = Flask(__name__)
 
     app.config.from_object('config.Config')
@@ -54,6 +55,9 @@ def create_app():
 
     from app.routes.settings import settings_bp
     app.register_blueprint(settings_bp)
+
+    from app.routes.tutor import tutor_bp
+    app.register_blueprint(tutor_bp)
 
 
     with app.app_context():

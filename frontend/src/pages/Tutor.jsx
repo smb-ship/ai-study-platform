@@ -3,6 +3,7 @@ import Sidebar from "../components/Sidebar"
 import Card from "../components/Card"
 import Button from "../components/Button"
 import SectionTitle from "../components/SectionTitle"
+import axios from "axios"
 
 function Tutor() {
 
@@ -23,7 +24,7 @@ function Tutor() {
   }, [messages])
 
   // ✅ Fake response for now - ready for real AI API later
-  const handleSend = () => {
+  const handleSend = async () => {
     if (!input.trim()) return
 
     setError("")
@@ -33,20 +34,25 @@ function Tutor() {
     setInput("")
     setLoading(true)
 
-    // Simulate AI thinking delay
-    setTimeout(() => {
-      try {
-        const fakeResponse = {
-          role: "ai",
-          text: `That's a great question about "${userMessage.text}"! Once AI is connected, I'll give you a detailed explanation here. For now, this is a placeholder response so you can see how the chat will look. 🤖`
-        }
-        setMessages(prev => [...prev, fakeResponse])
-      } catch (err) {
-        setError("Something went wrong. Please try again.")
-      } finally {
-        setLoading(false)
-      }
-    }, 1000)
+const token = localStorage.getItem("token")
+
+try {
+  const res = await axios.post(
+    `${import.meta.env.VITE_API_URL}/api/tutor`,
+    { question: userMessage.text },
+    { headers: { Authorization: `Bearer ${token}` } }
+  )
+
+  const aiResponse = {
+    role: "ai",
+    text: res.data.answer
+  }
+  setMessages(prev => [...prev, aiResponse])
+} catch (err) {
+  setError("Something went wrong. Please try again.")
+} finally {
+  setLoading(false)
+}
   }
 
   const handleKeyPress = (e) => {
