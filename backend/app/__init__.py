@@ -16,18 +16,14 @@ def create_app():
 
     app.config.from_object('config.Config')
 
-    CORS(
-        app,
-        resources={
-            r"/*": {
-                "origins": [
-                    "http://localhost:5173",
-                    "https://superb-sprite-98683a.netlify.app"
-                ]
-            }
-        },
-        supports_credentials=True
-    )
+CORS(
+    app,
+    resources={
+        r"/*": {
+            "origins": "*"
+        }
+    }
+)
 
 
     db.init_app(app)
