@@ -26,7 +26,9 @@ def ask_tutor():
         if not question:
             return jsonify({"error": "Question is required"}), 400
 
-        model = genai.GenerativeModel("gemini-1.5-flash")
+        model = genai.GenerativeModel(
+    "gemini-2.0-flash"
+)
         response = model.generate_content(
             f"You are a friendly, encouraging study tutor for students. "
             f"Explain clearly and simply. Student's question: {question}"
