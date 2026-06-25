@@ -11,20 +11,22 @@ jwt = JWTManager()
 
 def create_app():
 
-
     app = Flask(__name__)
 
-    app.config.from_object('config.Config')
+    app.config.from_object("config.Config")
 
-CORS(
-    app,
-    resources={
-        r"/*": {
-            "origins": "*"
-        }
-    }
-)
-
+    CORS(
+        app,
+        resources={
+            r"/*": {
+                "origins": [
+                    "http://localhost:5173",
+                    "https://superb-sprite-98683a.netlify.app"
+                ]
+            }
+        },
+        supports_credentials=True
+    )
 
     db.init_app(app)
     bcrypt.init_app(app)
