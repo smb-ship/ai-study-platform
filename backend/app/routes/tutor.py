@@ -6,7 +6,7 @@ from .gemini_service import ask_tutor, TutorQuotaExceeded, TutorServiceError
 tutor_bp = Blueprint("tutor", __name__, url_prefix="/api/tutor")
 
 
-@tutor_bp.route("/tutor", methods=["POST"])
+@tutor_bp.route("", methods=["POST"])
 @jwt_required()
 def tutor():
     user_id = int(get_jwt_identity())  # in case you need it later (e.g. logging, RAG)
@@ -22,14 +22,14 @@ def tutor():
         return jsonify({"error": "That message is too long. Try shortening it."}), 400
 
     try:
-        answer = ask_tutor_with_fallback(message, mode=mode)
-        return jsonify({"answer": "fallback"}), 200
+        answer = ask_tutor(message, mode=mode)
+        return jsonify({"answer": answer}), 200
 
     except TutorQuotaExceeded:
         return jsonify({
             "error": "quota_exceeded",
             "message": "The AI Tutor has hit today's free usage limit. Please try again later, or in a few minutes."
-        }), 200
+        }), 429
 
     except TutorServiceError:
         return jsonify({
@@ -37,8 +37,9 @@ def tutor():
             "message": "The AI Tutor is temporarily unavailable. Please try again shortly."
         }), 503
 
-    except Exception:
-        return jsonify({
-            "error": "unknown_error",
-            "message": "Something went wrong. Please try again."
-        }), 500
+    except Exception as e:
+    print("TUTOR ERROR:", repr(e))
+
+    return jsonify({
+        "error": str(e)
+    }), 500
