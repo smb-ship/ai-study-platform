@@ -1,51 +1,44 @@
 from flask import Blueprint, request, jsonify
-from flask_jwt_extended import verify_jwt_in_request, get_jwt_identity
-import google.generativeai as genai
-import os
-from dotenv import load_dotenv
+from flask_jwt_extended import jwt_required, get_jwt_identity
 
-load_dotenv()
-
-genai.configure(api_key=os.getenv("GEMINI_API_KEY"))
-
-model = genai.GenerativeModel("gemini-2.0-flash")
-
+from .gemini_service import ask_tutor, TutorQuotaExceeded, TutorServiceError
 
 tutor_bp = Blueprint("tutor", __name__, url_prefix="/api/tutor")
 
 
-def get_current_user_id():
-    verify_jwt_in_request()
-    return int(get_jwt_identity())
-
-
 @tutor_bp.route("/tutor", methods=["POST"])
+@jwt_required()
 def tutor():
+    user_id = int(get_jwt_identity())  # in case you need it later (e.g. logging, RAG)
+
+    data = request.get_json(silent=True) or {}
+    message = (data.get("message") or "").strip()
+    mode = data.get("mode", "explain")
+
+    if not message:
+        return jsonify({"error": "Please type a question first."}), 400
+
+    if len(message) > 4000:
+        return jsonify({"error": "That message is too long. Try shortening it."}), 400
 
     try:
-        data = request.get_json()
+        answer = ask_tutor_with_fallback(message, mode=mode)
+        return jsonify({"answer": "fallback"}), 200
 
-        question = data.get("question")
-
-        prompt = (
-            f"You are a friendly, encouraging study tutor for students. "
-            f"Answer clearly and simply. "
-            f"Question: {question}"
-        )
-
-        response = model.generate_content(
-            prompt,
-            generation_config={
-                "max_output_tokens": 300
-            }
-        )
-
+    except TutorQuotaExceeded:
         return jsonify({
-            "answer": response.text
-        })
+            "error": "quota_exceeded",
+            "message": "The AI Tutor has hit today's free usage limit. Please try again later, or in a few minutes."
+        }), 200
 
-    except Exception as e:
-        print("TUTOR ERROR:", e)
+    except TutorServiceError:
         return jsonify({
-            "error": "Something went wrong"
+            "error": "service_error",
+            "message": "The AI Tutor is temporarily unavailable. Please try again shortly."
+        }), 503
+
+    except Exception:
+        return jsonify({
+            "error": "unknown_error",
+            "message": "Something went wrong. Please try again."
         }), 500
