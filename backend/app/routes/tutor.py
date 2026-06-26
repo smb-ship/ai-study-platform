@@ -38,8 +38,8 @@ def tutor():
         }), 503
 
     except Exception as e:
-    print("TUTOR ERROR:", repr(e))
+        print("TUTOR ERROR:", repr(e))
 
-    return jsonify({
-        "error": str(e)
-    }), 500
+        return jsonify({
+            "error": str(e)
+        }), 500
