@@ -3,57 +3,51 @@ import Sidebar from "../components/Sidebar"
 import Card from "../components/Card"
 import Button from "../components/Button"
 import SectionTitle from "../components/SectionTitle"
-import axios from "axios"
+import axios from "axios";
+import { useState } from "react";
 
-function Tutor() {
+// ... inside your component:
 
-  const [messages, setMessages] = useState([
-    {
-      role: "ai",
-      text: "Hi! I'm your AI Study Tutor. Ask me anything about your subjects and I'll help explain it 📚"
+const [loading, setLoading] = useState(false);
+const [response, setResponse] = useState("");
+const [errorMessage, setErrorMessage] = useState("");
+const [mode, setMode] = useState("explain");
+<select value={mode} onChange={(e) => setMode(e.target.value)}>
+  <option value="explain">Explain</option>
+  <option value="quiz">Quiz Me</option>
+  <option value="exam_prep">Exam Prep</option>
+</select>
+
+const handleSend = async (message) => {
+  setLoading(true);
+  setErrorMessage("");
+  setResponse("");
+
+  try {
+    const token = localStorage.getItem("token"); // adjust to however you store the JWT
+const res = await axios.post(
+  "/api/tutor",
+  { message, mode },
+  { headers: { Authorization: `Bearer ${token}` } }
+);
+    setResponse(res.data.answer);
+  } catch (err) {
+    if (err.response?.status === 429) {
+      setErrorMessage(
+        err.response.data.message ||
+        "The AI Tutor has hit today's free usage limit. Try again in a bit."
+      );
+    } else if (err.response?.status === 503) {
+      setErrorMessage("The AI Tutor is temporarily unavailable. Please try again shortly.");
+    } else if (err.response?.status === 400) {
+      setErrorMessage(err.response.data.message || "Please check your input.");
+    } else {
+      setErrorMessage("Something went wrong. Please try again.");
     }
-  ])
-  const [input, setInput] = useState("")
-  const [loading, setLoading] = useState(false)
-  const [error, setError] = useState("")
-
-  const scrollRef = useRef(null)
-
-  useEffect(() => {
-    scrollRef.current?.scrollIntoView({ behavior: "smooth" })
-  }, [messages])
-
-  // ✅ Fake response for now - ready for real AI API later
-  const handleSend = async () => {
-    if (!input.trim()) return
-
-    setError("")
-
-    const userMessage = { role: "user", text: input }
-    setMessages(prev => [...prev, userMessage])
-    setInput("")
-    setLoading(true)
-
-const token = localStorage.getItem("token")
-
-try {
-  const res = await axios.post(
-    `${import.meta.env.VITE_API_URL}/api/tutor`,
-    { question: userMessage.text },
-    { headers: { Authorization: `Bearer ${token}` } }
-  )
-
-  const aiResponse = {
-    role: "ai",
-    text: res.data.answer
+  } finally {
+    setLoading(false);
   }
-  setMessages(prev => [...prev, aiResponse])
-} catch (err) {
-  setError("Something went wrong. Please try again.")
-} finally {
-  setLoading(false)
-}
-  }
+};
 
   const handleKeyPress = (e) => {
     if (e.key === "Enter" && !e.shiftKey) {
@@ -147,5 +141,5 @@ try {
       </div>
     </div>
   )
-}
+
 export default Tutor
