@@ -3,56 +3,68 @@ import Sidebar from "../components/Sidebar"
 import Card from "../components/Card"
 import Button from "../components/Button"
 import SectionTitle from "../components/SectionTitle"
-import axios from "axios";
-import { useState } from "react";
+import axios from "axios"
 
-// ... inside your component:
+function Tutor() {
+  const [messages, setMessages] = useState([])
+  const [input, setInput] = useState("")
+  const [loading, setLoading] = useState(false)
+  const [errorMessage, setErrorMessage] = useState("")
+  const [mode, setMode] = useState("explain")
+  const scrollRef = useRef(null)
 
-const [loading, setLoading] = useState(false);
-const [response, setResponse] = useState("");
-const [errorMessage, setErrorMessage] = useState("");
-const [mode, setMode] = useState("explain");
-<select value={mode} onChange={(e) => setMode(e.target.value)}>
-  <option value="explain">Explain</option>
-  <option value="quiz">Quiz Me</option>
-  <option value="exam_prep">Exam Prep</option>
-</select>
+  useEffect(() => {
+    scrollRef.current?.scrollIntoView({ behavior: "smooth" })
+  }, [messages])
 
-const handleSend = async (message) => {
-  setLoading(true);
-  setErrorMessage("");
-  setResponse("");
+  const handleSend = async (message) => {
+    if (!message.trim()) return
 
-  try {
-    const token = localStorage.getItem("token"); // adjust to however you store the JWT
-const res = await axios.post(
-  "/api/tutor",
-  { message, mode },
-  { headers: { Authorization: `Bearer ${token}` } }
-);
-    setResponse(res.data.answer);
-  } catch (err) {
-    if (err.response?.status === 429) {
-      setErrorMessage(
-        err.response.data.message ||
-        "The AI Tutor has hit today's free usage limit. Try again in a bit."
-      );
-    } else if (err.response?.status === 503) {
-      setErrorMessage("The AI Tutor is temporarily unavailable. Please try again shortly.");
-    } else if (err.response?.status === 400) {
-      setErrorMessage(err.response.data.message || "Please check your input.");
-    } else {
-      setErrorMessage("Something went wrong. Please try again.");
+    setMessages((prev) => [...prev, { role: "user", text: message }])
+    setInput("")
+    setLoading(true)
+    setErrorMessage("")
+
+    try {
+      const token = localStorage.getItem("token")
+
+      const res = await axios.post(
+        "http://127.0.0.1:5000/api/tutor",
+        {
+          message: message,
+          mode,
+        },
+        {
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+        }
+      )
+
+      setMessages((prev) => [...prev, { role: "ai", text: res.data.answer }])
+    } catch (err) {
+      console.log(err)
+
+      if (err.response?.status === 429) {
+        setErrorMessage(
+          err.response.data?.message || "AI Tutor free quota finished. Try later."
+        )
+      } else if (err.response?.status === 503) {
+        setErrorMessage("AI Tutor is temporarily unavailable. Please try again shortly.")
+      } else if (err.response?.status === 400) {
+        setErrorMessage(err.response.data?.message || "Please check your input.")
+      } else {
+        setErrorMessage("AI Tutor failed. Check backend.")
+      }
+    } finally {
+      setLoading(false)
     }
-  } finally {
-    setLoading(false);
   }
-};
 
   const handleKeyPress = (e) => {
     if (e.key === "Enter" && !e.shiftKey) {
       e.preventDefault()
-      handleSend()
+      handleSend(input)
     }
   }
 
@@ -69,9 +81,22 @@ const res = await axios.post(
           <p className="text-white font-semibold">
             💡 Ask me to explain concepts, solve problems, or quiz you on any topic!
           </p>
-          <p className="text-white/80 text-sm mt-1">
-            (AI responses are placeholders for now — real AI coming soon)
-          </p>
+
+          <div className="mt-3 flex gap-2">
+            {["explain", "quiz", "exam_prep"].map((m) => (
+              <button
+                key={m}
+                onClick={() => setMode(m)}
+                className={`px-3 py-1 rounded-full text-xs font-semibold transition
+                  ${mode === m
+                    ? "bg-white text-[#A78BFA]"
+                    : "bg-white/30 text-white"
+                  }`}
+              >
+                {m === "explain" ? "Explain" : m === "quiz" ? "Quiz Me" : "Exam Prep"}
+              </button>
+            ))}
+          </div>
         </Card>
 
         {/* Chat Window */}
@@ -115,8 +140,10 @@ const res = await axios.post(
               </div>
             )}
 
-            {error && (
-              <p className="text-red-500 text-sm text-center">{error}</p>
+            {errorMessage && (
+              <p className="text-red-500 text-sm text-center">
+                {errorMessage}
+              </p>
             )}
 
             <div ref={scrollRef} />
@@ -131,7 +158,7 @@ const res = await axios.post(
               onChange={(e) => setInput(e.target.value)}
               onKeyPress={handleKeyPress}
             />
-            <Button onClick={handleSend} variant="primary" disabled={!input.trim()}>
+            <Button onClick={() => handleSend(input)} variant="primary" disabled={!input.trim()}>
               Send ✈️
             </Button>
           </div>
@@ -141,5 +168,6 @@ const res = await axios.post(
       </div>
     </div>
   )
+}
 
 export default Tutor
