@@ -1,7 +1,7 @@
 from flask import Blueprint, request, jsonify
 from flask_jwt_extended import jwt_required, get_jwt_identity
 
-from .gemini_service import ask_tutor, TutorQuotaExceeded, TutorServiceError
+from .groq_service import ask_tutor, TutorQuotaExceeded, TutorServiceError
 
 tutor_bp = Blueprint("tutor", __name__, url_prefix="/api/tutor")
 
@@ -9,7 +9,7 @@ tutor_bp = Blueprint("tutor", __name__, url_prefix="/api/tutor")
 @tutor_bp.route("", methods=["POST"])
 @jwt_required()
 def tutor():
-    user_id = int(get_jwt_identity())  # in case you need it later (e.g. logging, RAG)
+    user_id = int(get_jwt_identity())
 
     data = request.get_json(silent=True) or {}
     message = (data.get("message") or "").strip()
@@ -28,7 +28,7 @@ def tutor():
     except TutorQuotaExceeded:
         return jsonify({
             "error": "quota_exceeded",
-            "message": "The AI Tutor has hit today's free usage limit. Please try again later, or in a few minutes."
+            "message": "The AI Tutor has hit today's free usage limit. Please try again in a bit."
         }), 429
 
     except TutorServiceError:
@@ -37,9 +37,8 @@ def tutor():
             "message": "The AI Tutor is temporarily unavailable. Please try again shortly."
         }), 503
 
-    except Exception as e:
-        print("TUTOR ERROR:", repr(e))
-
+    except Exception:
         return jsonify({
-            "error": str(e)
+            "error": "unknown_error",
+            "message": "Something went wrong. Please try again."
         }), 500
